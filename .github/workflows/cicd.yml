@@ -1,0 +1,57 @@
+name: "CI/CD"
+on:
+- push
+- pull_request
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v22
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: DeterminateSystems/magic-nix-cache-action@v2
+    - run: nix flake check
+  build-html:
+    needs:
+    - check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v22
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: DeterminateSystems/magic-nix-cache-action@v2
+    - run: nix build .#html
+    - uses: actions/upload-pages-artifact@v2
+      with:
+        path: result/
+  build-pdf:
+    needs:
+    - check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v22
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: DeterminateSystems/magic-nix-cache-action@v2
+    - run: nix build .#pdf --no-sandbox
+    - uses: actions/upload-artifact@v3
+      with:
+        name: pdf
+        path: result/
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs:
+    - build-html
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+    - id: deploy
+      uses: actions/deploy-pages@v2
