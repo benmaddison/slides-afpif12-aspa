@@ -2,6 +2,17 @@
 version: 0.2
 language: en-GB
 words:
-  - Maddison
-  - Workonline
+- Maddison
+- Workonline
+- aspa
+- Peerlock
+- WGLC
+- rpki
+- Routinator
+- RPSTIR
+- rpkimancer
+- openbgpd
+- ASID
+- sidrops
+- incl
 ...

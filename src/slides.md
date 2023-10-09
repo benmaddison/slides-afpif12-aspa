@@ -16,7 +16,7 @@ paginate: true
 
 > A route leak is the propagation of routing announcement(s) beyond their intended scope - RFC7908
 
-```
+``` figure
             +-------+ (P)         +-------+ (P)
             |  AS1  |------------>|  AS2  |---------->
         +---+-------+             +-------+ leak propagated!
@@ -42,7 +42,7 @@ Route leaks hurt *everyone*:
 - Security and policy controls are bypassed
 - NOCs everywhere try to diagnose problems that they don't have enough data to understand
 
-**Every AS that propagates the leak increases the blast radius**
+Every AS that propagates the leak **increases the blast radius**
 
 # What does the solution look like?
 
@@ -57,7 +57,7 @@ Data describing the "intended propagation scope" of a BGP path that is:
 
 Good news!
 
-If we can describe a *data structure* and *authorisation model* that fulfills #1 and #2, then the existing RPKI gives us #3 and #4 for free
+If we can describe a *data structure* and *authorisation model* that fulfils #1 and #2, then the existing RPKI gives us #3 and #4 for free
 
 :-)
 
@@ -137,17 +137,18 @@ ASID ::= INTEGER (0..4294967295)
 
 # ASPA object processing
 
-- ASPA objects are produced by RPKI CAs
-  [draft-ietf-sidrops-aspa-profile]
-- RPKI-RTR is (usually) how the data gets to the router
-  [draft-ietf-sidrops-8210bis]
-- ASPA verification algorithm operates on the data contained in the RTR payload (aka **VAP**).
-  [draft-ietf-sidrops-aspa-verification]
+-   ASPA objects are produced by RPKI CAs
+    [draft-ietf-sidrops-aspa-profile]
+-   RPKI-RTR is (usually) how the data gets to the router
+    [draft-ietf-sidrops-8210bis]
+-   ASPA verification algorithm operates on the data contained in the RTR payload (aka **VAP**).
+    [draft-ietf-sidrops-aspa-verification]
 
 [draft-ietf-sidrops-aspa-profile]: https://datatracker.ietf.org/doc/draft-ietf-sidrops-aspa-profile/
 [draft-ietf-sidrops-8210bis]: https://datatracker.ietf.org/doc/draft-ietf-sidrops-8210bis/
 [draft-ietf-sidrops-aspa-verification]: https://datatracker.ietf.org/doc/draft-ietf-sidrops-aspa-verification/
 
+<!-- markdownlint-disable ol-prefix no-duplicate-heading -->
 # BGP Route Processing
 
 Each BGP path gets an `AS_PATH` verification state:
@@ -156,7 +157,7 @@ Each BGP path gets an `AS_PATH` verification state:
 - **Invalid**: at least one transit AS in the `AS_PATH` is acting in contravention of its neighbors' ASPA authorisations
 - **Unknown**: insufficient ASPA data exists to arrive at either Valid or Invalid
 
-# BGP Route Processing (cont.)
+# BGP Route Processing
 
 `draft-ietf-sidrops-aspa-verification` defines two algorithms:
 
@@ -164,7 +165,7 @@ Each BGP path gets an `AS_PATH` verification state:
     For paths received from non-transits (customers, peers, etc).
     The entire `AS_PATH` is expected to contain only *customer-to-provider* adjacencies
 
-# BGP Route Processing (cont..)
+# BGP Route Processing
 
 `draft-ietf-sidrops-aspa-verification` defines two algorithms:
 
@@ -174,11 +175,11 @@ Each BGP path gets an `AS_PATH` verification state:
     - An **up-ramp** of *customer-to-provider* adjacencies
     - A **down-ramp** of *provider-to-customer* adjacencies
 
-# BGP Route Processing (cont...)
+# BGP Route Processing
 
 Up-ramp / down-ramp visualisation
 
-``` asn1
+``` figure
                        AS(L) ............. AS(K)
                         /                     \
                     AS(L+1)                  AS(K-1)
@@ -191,15 +192,16 @@ Up-ramp / down-ramp visualisation
                  /                                (Origin AS)
        Receiving & Validating AS
 ```
+<!-- markdownlint-restore -->
 
 # Alternatives?
 
-- IRR data does not contain the necessary policy information (no `transit-via` in `aut-num`)
-- [Peerlock] has similar semantics, however:
-  - No crypto (in general)
-  - Highly manual
-  - Requires bug-free `AS_PATH` regex ;-)
-- BGPsec solves a different problem - truthfulness of `AS_PATH`, not verification of routing policy
+-   IRR data does not contain the necessary policy information (no `transit-via` in `aut-num`)
+-   [Peerlock] has similar semantics, however:
+    - No crypto (in general)
+    - Highly manual
+    - Requires bug-free `AS_PATH` regex ;-)
+-   BGPsec solves a different problem - truthfulness of `AS_PATH`, not verification of routing policy
 
 [Peerlock]: https://archive.nanog.org/sites/default/files/Snijders_Everyday_Practical_Bgp.pdf
 
@@ -219,7 +221,7 @@ Incrementally deployable:
 - A small number of published ASPA objects can make a large number of leaks detectable
 - A small number of operators dropping ASPA "Invalid" paths can protect a significant part of the Internet
 
-# Benefits (cont.)
+# Benefits (cont..)
 
 Well defined semantics:
 
@@ -233,16 +235,12 @@ Well defined semantics:
 
 # Current Status - IETF
 
-- [draft-ietf-sidrops-aspa-profile] and [draft-ietf-sidrops-aspa-verification] currently in WGLC.
-  - Mostly complete and stable
-  - Discussion ongoing about how "transit-free" should be represented
-- [draft-ietf-sidrops-8210bis] was awaiting RFC publication - needs a revision to remove per-AFI data structure
+-   [draft-ietf-sidrops-aspa-profile] and [draft-ietf-sidrops-aspa-verification] currently in WGLC.
+    - Mostly complete and stable
+    - Discussion ongoing about how "transit-free" should be represented
+-   [draft-ietf-sidrops-8210bis] was awaiting RFC publication - needs a revision to remove per-AFI data structure
 
 **Please review!**
-
-[draft-ietf-sidrops-aspa-profile]: https://datatracker.ietf.org/doc/draft-ietf-sidrops-aspa-profile/
-[draft-ietf-sidrops-8210bis]: https://datatracker.ietf.org/doc/draft-ietf-sidrops-8210bis/
-[draft-ietf-sidrops-aspa-verification]: https://datatracker.ietf.org/doc/draft-ietf-sidrops-aspa-verification/
 
 # Current Status - Implementations
 
@@ -251,7 +249,7 @@ Well defined semantics:
 - Tooling and testing - `rpkimancer`, various others
 - BGP speaker implementations - `openbgpd`, NIST BGP-SRx
 
-**Still missing commercial NOS vendors**
+Still missing **commercial NOS vendors**
 
 # Operator involvement
 

@@ -1,10 +1,13 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
     flake-utils.url = "github:numtide/flake-utils";
     builder = {
       url = "github:benmaddison/slides-template";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-utils.follows = "flake-utils";
+      };
     };
   };
 
@@ -26,7 +29,7 @@
           pdf = lib.buildPdf { inherit src; };
           html = lib.buildHtml { inherit src; };
 
-          lint = lib.lint { inherit src; };
+          lint = lib.lint { inherit src; config = ./.markdownlint.yml; };
           spell = lib.spell { inherit src; config = ./cspell.yaml; };
         };
 
